@@ -18,28 +18,38 @@ class Board extends React.Component {
       isXNext: true,
     };
   }
-
+  
   handleClick(i) {
     const squares = this.state.squares.slice();
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
     squares[i] = this.state.isXNext ? 'X' : 'O';
     this.setState({
       squares: squares,
       isXNext: !this.state.isXNext,
     });
   }
-
+  
   renderSquare(i) {
     return (
       <Square
-       value={this.state.squares[i]}
-       onClick={() => this.handleClick(i)}
+        value={this.state.squares[i]}
+        onClick={() => this.handleClick(i)}
       />
     );
   }
-
+  
   render() {
-    const status = 'Next Player: ' + (this.state.isXNext ? 'X' : 'O');
-
+  
+    const winner = calculateWinner(this.state.squares);
+    let status;
+    if (winner) {
+      status = 'Winner: ' + winner;
+    } else {
+      status = 'Next Player: ' + (this.state.isXNext ? 'X' : 'O');
+    }
+    
     return (
       <div>
         <div className="status">{status}</div>
@@ -68,7 +78,7 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board/>
         </div>
         <div className="game-info">
           <div>{/* status */}</div>
@@ -92,13 +102,19 @@ function calculateWinner(squares) {
   ];
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
-    
+    if (squares[a]
+      && squares[a] === squares[b]
+      && squares[a] === squares[c]) {
+      return squares[a];
+    }
   }
+  return null;
+  
 }
 
 // =======================================
 
 ReactDOM.render(
-  <Game />,
+  <Game/>,
   document.getElementById('root')
 );
